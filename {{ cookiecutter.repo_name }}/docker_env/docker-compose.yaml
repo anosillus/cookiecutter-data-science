@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  rstudio:
+    container_name: rstudio_container:1.0
+    restart: always
+    build:
+      context: ./R_env
+    volumes:
+      - ./../main:/home/rstudio/main
+      - ./../playground:/home/rstudio/playground
+      - ./../data:/home/rstudio/data
+      - ./../src:/home/rstudio/src
+      - ./../reports:/rstudio/reports
+      - ./../docker_env/R_env:/rstudio/R_env
+    ports:
+      - "8787:8787"
+    environment:
+      USER: "rstudio"
+      DISABLE_AUTH: "TRUE"
+      ROOT: "TRUE"
+      PASSWORD: "r"
+  jupyter:
+    container_name: jupyter_container:1.0
+    restart: always
+    build:
+      context: ./python_env
+    volumes:
+      - ./../main:/home/work/main
+      - ./../playground:/home/work/playground
+      - ./../data:/home/work/data
+      - ./../src:/home/work/src
+      - ./../reports:/work/reports
+      - ./../docker_env/python_env:/work/python_env
+   ports:
+      - "8888:8888"
+    environment:
+      ROOT: "TRUE"
+      TZ: Asia/Tokyo
+    command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/work/notebook"
+  postgres:
+    container_name: postgres_container:1.0
+    restart: always
+    image: postgres:12.1
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: Asia/Tokyo
+    ports:
+      - 5432:5432
+    volumes:
+      - ./../data/db:/var/lib/postgresql/data
+  pgAdmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8000:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: 1234
+    volumes:
+      - ./../data/db:/root/.pgadmin
