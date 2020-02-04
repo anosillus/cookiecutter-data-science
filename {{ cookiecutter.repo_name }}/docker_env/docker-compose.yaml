@@ -2,7 +2,7 @@ version: "3"
 
 services:
   rstudio:
-    container_name: rstudio_container:1.0
+    container_name: rstudio_container
     restart: always
     build:
       context: ./R_env
@@ -12,7 +12,7 @@ services:
       - ./../data:/home/rstudio/data
       - ./../src:/home/rstudio/src
       - ./../reports:/rstudio/reports
-      - ./../docker_env/R_env:/rstudio/R_env
+      - ./../docker_env/R_env:/rstudio/env
     ports:
       - "8787:8787"
     environment:
@@ -21,7 +21,7 @@ services:
       ROOT: "TRUE"
       PASSWORD: "r"
   jupyter:
-    container_name: jupyter_container:1.0
+    container_name: jupyter_container
     restart: always
     build:
       context: ./python_env
@@ -30,16 +30,16 @@ services:
       - ./../playground:/home/work/playground
       - ./../data:/home/work/data
       - ./../src:/home/work/src
-      - ./../reports:/work/reports
-      - ./../docker_env/python_env:/work/python_env
-   ports:
+      - ./../reports:/home/work/reports
+      - ./../docker_env/python_env:/home/work/env
+    ports:
       - "8888:8888"
     environment:
       ROOT: "TRUE"
       TZ: Asia/Tokyo
     command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/work/notebook"
   postgres:
-    container_name: postgres_container:1.0
+    container_name: postgres_container
     restart: always
     image: postgres:12.1
     environment:
