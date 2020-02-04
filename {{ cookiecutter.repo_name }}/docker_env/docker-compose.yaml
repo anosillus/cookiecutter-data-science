@@ -26,18 +26,18 @@ services:
     build:
       context: ./python_env
     volumes:
-      - ./../main:/home/work/main
-      - ./../playground:/home/work/playground
-      - ./../data:/home/work/data
-      - ./../src:/home/work/src
-      - ./../reports:/home/work/reports
-      - ./../docker_env/python_env:/home/work/env
+      - ./../main:/home/main
+      - ./../playground:/home/playground
+      - ./../data:/home/data
+      - ./../src:/home/src
+      - ./../reports:/home/reports
+      - ./../docker_env/python_env:/home/env
     ports:
       - "8888:8888"
     environment:
       ROOT: "TRUE"
       TZ: Asia/Tokyo
-    command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/work/notebook"
+    command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/main"
   postgres:
     container_name: postgres_container
     restart: always
