@@ -51,13 +51,16 @@ services:
       - 5432:5432
     volumes:
       - ./../data/db:/var/lib/postgresql/data
+      - ./../data/db:/var/lib/postgresql/data
+      # - ./../data/db_init:/docker-entrypoint-initdb.d/
   pgAdmin:
+    container_name: pgAdmin_container
     image: dpage/pgadmin4
     restart: always
     ports:
       - "8000:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: 1234
-    volumes:
+      PGADMIN_DEFAULT_EMAIL: pgadmin
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+      volumes:
       - ./../data/db:/root/.pgadmin
