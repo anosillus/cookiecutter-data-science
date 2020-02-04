@@ -2,12 +2,9 @@ FROM nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04
 
 # Add this to the path for TensorFlow
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
-
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
-ENV PATH /opt/conda/bin:$PATH
 ENV ANACONDA_VERSION=2019.10
 ENV TZ Asia/Tokyo
-
 RUN apt-get update --fix-missing && \
     apt-get install -y wget curl bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
     # fonts-ipafont fonts-ipaexfont fonts-noto-cjk #libxml2 is for pip library
@@ -22,14 +19,12 @@ RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_6
     # find /opt/conda/ -follow -type f -name '*.pyc' -delete && \
     find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
     /opt/conda/bin/conda clean -afy
-
 RUN TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
     curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
     dpkg -i tini.deb && \
     rm tini.deb && \
     rm -rf /var/lib/apt/lists/*
 # "
-
 RUN mkdir -p ~/.jupyter && { \
     echo "c.NotebookApp.allow_root = True"; \
     echo "c.NotebookApp.ip = '0.0.0.0'"; \
@@ -37,16 +32,11 @@ RUN mkdir -p ~/.jupyter && { \
     echo "c.JupyterLabTemplates.template_dirs = ['list', 'of', 'template', 'directories']"; \
     echo "c.JupyterLabTemplates.include_default = True"; \
     } | tee ~/.jupyter/jupyter_notebook_config.py
-
 ENV CONDA_DIR=/opt/conda
-
-
+ENV PATH /opt/conda/bin:$PATH
 RUN apt-get update --fix-missing && \
     apt-get install -y build-essential libxml2-dev fish fonts-ipafont fonts-ipaexfont fonts-noto-cjk libxml2 build-essential && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-
-
 # SHELL ["/bin/bash", "-c"]
 RUN pip install flake8 flake8-SQL flake8-bandit flake8-black flake8-broken-line flake8-bugbear flake8-builtins flake8-import-order flake8-spellcheck flake8-strict flake8-string-format pandas-vet pep8-naming jupyter-lsp && \
     $CONDA_DIR/bin/conda install jupyterlab psycopg2 ipywidgets nodejs jupyter && \
@@ -96,7 +86,6 @@ RUN pip install flake8 flake8-SQL flake8-bandit flake8-black flake8-broken-line 
         rm -rf $HOME/.local && \
         find /opt/conda/ -follow -type f -name '*.a' -delete && \
         find /opt/conda/ -follow -type f -name '*.js.map' -delete
-
 COPY ./environment.yaml /tmp
 RUN $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
     $CONDA_DIR/bin/conda env update -f /tmp/environment.yaml && \
@@ -104,9 +93,7 @@ RUN $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
     $CONDA_DIR/bin/conda run -n python37 ipython kernel install --user --name=python37 && \
     rm /tmp/environment.yaml && \
     conda clean --all -f -y
-
 ENV PATH /opt/conda/envs/$(head -1 /tmp/environment.yaml | cut -d' ' -f2)/bin:$PATH
-
 EXPOSE 8888
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
 # CMD [ "/bin/bash" ]
