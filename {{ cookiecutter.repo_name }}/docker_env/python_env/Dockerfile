@@ -4,10 +4,8 @@ FROM nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV ANACONDA_VERSION=2019.10
-ENV TZ Asia/Tokyo
 RUN apt-get update --fix-missing && \
     apt-get install -y wget curl bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
-    # fonts-ipafont fonts-ipaexfont fonts-noto-cjk #libxml2 is for pip library
     apt-get clean && rm -rf /var/lib/apt/lists/*
 # RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-${ANACONDA_VERSION}-Linux-x86_64.sh -O ~/anaconda.sh && \
 RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O ~/anaconda.sh && \
@@ -16,7 +14,6 @@ RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_6
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
     find /opt/conda/ -follow -type f -name '*.a' -delete && \
-    # find /opt/conda/ -follow -type f -name '*.pyc' -delete && \
     find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
     /opt/conda/bin/conda clean -afy
 RUN TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
@@ -29,7 +26,7 @@ RUN mkdir -p ~/.jupyter && { \
     echo "c.NotebookApp.allow_root = True"; \
     echo "c.NotebookApp.ip = '0.0.0.0'"; \
     echo "c.NotebookApp.token = ''"; \
-    echo "c.JupyterLabTemplates.template_dirs = ['list', 'of', 'template', 'directories']"; \
+    echo "c.JupyterLabTemplates.template_dirs = ['/home/template']"; \
     echo "c.JupyterLabTemplates.include_default = True"; \
     } | tee ~/.jupyter/jupyter_notebook_config.py
 ENV CONDA_DIR=/opt/conda
@@ -38,10 +35,14 @@ RUN apt-get update --fix-missing && \
     apt-get install -y build-essential libxml2-dev fish fonts-ipafont fonts-ipaexfont fonts-noto-cjk libxml2 build-essential && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 # SHELL ["/bin/bash", "-c"]
-RUN pip install flake8 flake8-SQL flake8-bandit flake8-black flake8-broken-line flake8-bugbear flake8-builtins flake8-import-order flake8-spellcheck flake8-strict flake8-string-format pandas-vet pep8-naming jupyter-lsp && \
+RUN pip install jupyterlab_sql jupyterlab-git jupyter_bokeh jupyterlab_latex jupyterlab_templates nbdime && \
+    # pip install flake8 flake8-SQL flake8-bandit flake8-broken-line flake8-bugbear flake8-builtins flake8-import-order flake8-spellcheck flake8-strict flake8-string-format pandas-vet pep8-naming jupyter-lsp && \
     $CONDA_DIR/bin/conda install jupyterlab psycopg2 ipywidgets nodejs jupyter && \
-    $CONDA_DIR/bin/conda install -c conda-forge python-language-server && \
-    jupyter labextension install jupyterlab-flake8 --no-build && \
+    $CONDA_DIR/bin/conda install -c conda-forge python-language-server texlive-core pandoc bash_kernel awscli && \
+    jupyter labextension install @jupyterlab/plotly-extension --no-build && \
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
+    jupyter labextension install @bokeh/jupyter_bokeh --no-build && \
+    # jupyter labextension install jupyterlab-flake8 --no-build && \
     # jupyter labextension install @ryantam626/jupyterlab_code_formatter --no-build && \
     # Code Formatter https://github.com/ryantam626/jupyterlab_code_formatter
     # conda install -c jupyterlab_code_formatter && \
@@ -50,29 +51,19 @@ RUN pip install flake8 flake8-SQL flake8-bandit flake8-black flake8-broken-line 
     jupyter labextension install @krassowski/jupyterlab-lsp --no-build && \
     # jupyter serverextension enable --py jupyterlab_code_formatter && \
     # Git-Sidebar https://github.com/jupyterlab/jupyterlab-git
-    pip install jupyterlab-git  && \
     # Latex https://github.com/jupyterlab/jupyterlab-latex
-    pip install jupyterlab_latex && \
     jupyter labextension install @jupyterlab/latex --no-build && \
     jupyter serverextension enable --sys-prefix jupyterlab_latex && \
     # Contents Table https://github.com/jupyterlab/jupyterlab-toc
     jupyter labextension install @jupyterlab/toc --no-build && \
     # Template Reader https://github.com/jpinzonc/jupyterlab_templates
-    pip install jupyterlab_templates && \
     jupyter labextension install jupyterlab_templates --no-build && \
     jupyter serverextension enable --py jupyterlab_templates && \
-    # jupyter serverextension enable --py jupyterlab_templates
-    # add following into jupyter_notebook_config.py
-    # c.JupyterLabTemplates.template_dirs = ['list', 'of', 'template', 'directories']
-    # c.JupyterLabTemplates.include_default = True
     # Diff tool https://nbdime.readthedocs.io/en/latest/extensions.html
-    pip install nbdime && \
     jupyter labextension install nbdime-jupyterlab --no-build && \
     # Spellchecker
     # https://github.com/ijmbarr/jupyterlab_spellchecker
-    jupyter labextension install @ijmbarr/jupyterlab_spellchecker && \
-    # sql
-    pip install jupyterlab_sql && \
+    # jupyter labextension install @ijmbarr/jupyterlab_spellchecker && \
     jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
     # widgetnbextension  https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
     # jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
@@ -92,7 +83,7 @@ RUN $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
     echo "conda activate $(head -1 /tmp/environment.yaml | cut -d' ' -f2)" >> ~/.bashrc && \
     $CONDA_DIR/bin/conda run -n python37 ipython kernel install --user --name=python37 && \
     rm /tmp/environment.yaml && \
-    conda clean --all -f -y
+    $CONDA_DIR/bin/conda clean --all -f -y
 ENV PATH /opt/conda/envs/$(head -1 /tmp/environment.yaml | cut -d' ' -f2)/bin:$PATH
 EXPOSE 8888
 ENTRYPOINT [ "/usr/bin/tini", "--" ]

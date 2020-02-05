@@ -1,34 +1,34 @@
 name: python37
 channels:
+  - anaconda
   - conda-forge
   - defaults
 dependencies:
   - python=3.7.*
+  # - cudatoolkit=10.2.*
+  # - cudnn=7.*
+  # - opencv=4.*
+  # - pydotplus
+  # - python-graphviz
+  # - networkx
+  # - tensorflow-gpu
+  # - pytorch-gpu
+  # - bokeh
+  # - category_encoders
+  # - graphviz
   - feather-format
-  - bokeh
-  - category_encoders
-  - cudatoolkit=10.2.*
-  - cudnn=7.*
-  - texlive-core
-  - pandoc
-  - graphviz
   - ipykernel
   - ipython-sql
   - ipywidgets
   - matplotlib
   - mypy
-  - networkx
   - numba
   - numpy
-  # - opencv=4.*
   - pandas
-  - pathlib2
   - pillow
-  - pydotplus
-  - python-graphviz
+  - python-dotenv
   - records
   - requests
-  # - rpy2
   - scikit-image
   - scikit-learn
   - scipy
@@ -37,8 +37,7 @@ dependencies:
   - tqdm
   - typing
   - pip:
-      - imblearn
-      - iplantuml
+      # - imblearn
       - japanize_matplotlib
       - optuna
       - plotly
