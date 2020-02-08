@@ -18,8 +18,6 @@ services:
     environment:
       DISABLE_AUTH: "TRUE"
       ROOT: "TRUE"
-      # USER: "rstudio"
-      # PASSWORD: "r"
       TZ: Asia/Tokyo
   jupyter:
     container_name: ds_jupyter_container
@@ -44,9 +42,9 @@ services:
     container_name: ds_postgres_container
     restart: always
     image: postgres:latest
-    # networks:
-    # ds_net:
-    # ipv4_address: 172.28.1.2
+    networks:
+      ds_net:
+        ipv4_address: 172.28.1.2
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: postgres
@@ -60,9 +58,9 @@ services:
   pgAdmin:
     container_name: ds_pgAdmin_container
     image: dpage/pgadmin4
-    # networks:
-    # ds_net:
-    # ipv4_address: 172.28.1.3
+    networks:
+      ds_net:
+        ipv4_address: 172.28.1.3
     restart: always
     ports:
       # - "8000:80"
@@ -70,17 +68,17 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: pgadmin
       PGADMIN_DEFAULT_PASSWORD: pgadmin
-      # TZ: Asia/Tokyo
-    # volumes:
-    # - ./../data/db_conf:/var/lib/pgadmin
-    # - ./../data/db_conf/pgadmin:/var/lib/pgadmin
-    # - ./../data/db_conf/servers.json:/pgadmin4/servers.json
-    # - ./../data/db:/root/.pgadmin
+      TZ: Asia/Tokyo
+    volumes:
+      - ./../data/db_conf:/var/lib/pgadmin
+      # - ./../data/db_conf/pgadmin:/var/lib/pgadmin
+      - ./../data/db_conf/servers.json:/pgadmin4/servers.json
+      - ./../data/db:/root/.pgadmin
     # - /path/to/certificate.cert:/certs/server.cert \
     # - /path/to/certificate.key:/certs/server.key \
-# networks:
-#   ds_net:
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: 172.28.0.0/16
+networks:
+  ds_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
