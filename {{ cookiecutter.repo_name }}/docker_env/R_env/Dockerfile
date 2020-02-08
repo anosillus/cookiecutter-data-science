@@ -1,4 +1,4 @@
-FROM rocker/tidyverse:3.6.2
+FROM rocker/tidyverse
 
 # Change environment to Japanese(Character and DateTime)
 RUN apt-get update && \
