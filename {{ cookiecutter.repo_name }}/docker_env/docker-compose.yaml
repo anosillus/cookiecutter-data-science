@@ -52,8 +52,8 @@ services:
       TZ: Asia/Tokyo
     ports:
       - 5432:5432
-    # volumes:
-    # - ./../data/db:/var/lib/postgresql/data
+    volumes:
+      - ./../data/db:/var/lib/postgresql/data
     # - ./../data/db_init:/docker-entrypoint-initdb.d/
   pgAdmin:
     container_name: ds_pgAdmin_container
@@ -69,11 +69,11 @@ services:
       PGADMIN_DEFAULT_EMAIL: pgadmin
       PGADMIN_DEFAULT_PASSWORD: pgadmin
       TZ: Asia/Tokyo
-    volumes:
-      - ./../data/db_conf:/var/lib/pgadmin
-      # - ./../data/db_conf/pgadmin:/var/lib/pgadmin
-      - ./../data/db_conf/servers.json:/pgadmin4/servers.json
-      - ./../data/db:/root/.pgadmin
+    # volumes:
+    # - ./../data/db_conf:/var/lib/pgadmin
+    # - ./../data/db_conf/pgadmin:/var/lib/pgadmin
+    # - ./../data/db_conf/servers.json:/pgadmin4/servers.json
+    # - ./../data/db:/root/.pgadmin
     # - /path/to/certificate.cert:/certs/server.cert \
     # - /path/to/certificate.key:/certs/server.key \
 networks:
