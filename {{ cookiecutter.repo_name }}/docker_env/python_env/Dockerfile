@@ -41,6 +41,7 @@ RUN pip install jupyterlab_sql jupyterlab-git jupyter_bokeh jupyterlab_latex jup
     $CONDA_DIR/bin/conda install -c conda-forge python-language-server texlive-core pandoc bash_kernel awscli && \
     jupyter labextension install @jupyterlab/plotly-extension --no-build && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
+    jupyter labextension install jupyter-matplotlib && \
     jupyter labextension install @bokeh/jupyter_bokeh --no-build && \
     # jupyter labextension install jupyterlab-flake8 --no-build && \
     # jupyter labextension install @ryantam626/jupyterlab_code_formatter --no-build && \
