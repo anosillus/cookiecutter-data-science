@@ -8,7 +8,6 @@ services:
       context: ./R_env
     volumes:
       - ./../main:/home/rstudio/main
-      - ./../playground:/home/rstudio/playground
       - ./../data:/home/rstudio/data
       - ./../src:/home/rstudio/src
       - ./../reports:/rstudio/reports
@@ -27,7 +26,6 @@ services:
     volumes:
       - ./../main:/home/main
       - ./../template:/home/template
-      - ./../playground:/home/playground
       - ./../data:/home/data
       - ./../src:/home/src
       - ./../reports:/home/reports

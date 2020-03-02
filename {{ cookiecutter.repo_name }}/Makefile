@@ -10,6 +10,19 @@ PROFILE = {{ cookiecutter.aws_profile }}
 PROJECT_NAME = {{ cookiecutter.repo_name }}
 PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
 
+
+# Renderer setting.
+# https://github.com/ipython/ipynb/blob/master/docs/Makefile
+SPHINXOPTS    =
+SPHINXBUILD   = sphinx-build
+PAPER         =
+BUILDDIR      = main/_build
+
+# Internal variables.
+PAPEROPT_a4     = -D latex_paper_size=a4
+PAPEROPT_letter = -D latex_paper_size=letter
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+
 ifeq (,$(shell which conda))
 HAS_CONDA=False
 else
@@ -19,6 +32,14 @@ endif
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
+
+## Run docker-compose up
+run:docker_env/docker-compose.yaml
+	docker-compose up -d $@
+
+## Rebuild docker container from file
+build:docker_env/docker-compose.yaml
+	docker-compose up -d $@ --build
 
 ## Install Python Dependencies
 requirements: test_environment
@@ -33,6 +54,7 @@ data: requirements
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
+	find . -type -d name "ipynb_checkpoints" -delete
 
 ## Lint using flake8
 lint:
@@ -54,6 +76,7 @@ else
 	aws s3 sync s3://$(BUCKET)/data/ data/ --profile $(PROFILE)
 endif
 
+.PHONY: create_environment
 ## Set up python interpreter environment
 create_environment:
 ifeq (True,$(HAS_CONDA))
@@ -72,6 +95,46 @@ else
 	@echo ">>> New virtualenv created. Activate with:\nworkon $(PROJECT_NAME)"
 endif
 
+.PHONY: html
+## HTML export
+html:
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
+.PHONY: latex
+## to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
+latex:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	@echo
+	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
+	@echo "Run \`make' in that directory to run these through (pdf)latex" \
+	      "(use \`make latexpdf' here to do that automatically)."
+
+.PHONY: latexpdf
+## to make LaTeX files and run them through pdflatex"
+latexpdf:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	@echo "Running LaTeX files through pdflatex..."
+	$(MAKE) -C $(BUILDDIR)/latex all-pdf
+	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
+
+.PHONY: latexpdfja
+## latexpdfja to make LaTeX files and run them through platex/dvipdfmx"
+latexpdfja:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	@echo "Running LaTeX files through platex and dvipdfmx..."
+	$(MAKE) -C $(BUILDDIR)/latex all-pdf-ja
+	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
+
+.PHONY: singlehtml
+## In singlehtml exporting
+singlehtml:
+	$(SPHINXBUILD) -b singlehtml $(ALLSPHINXOPTS) $(BUILDDIR)/singlehtml
+	@echo
+	@echo "Build finished. The HTML page is in $(BUILDDIR)/singlehtml."
+
+.PHONY: test_environment
 ## Test python environment is setup correctly
 test_environment:
 	$(PYTHON_INTERPRETER) test_environment.py
@@ -142,3 +205,5 @@ help:
 		printf "\n"; \
 	}' \
 	| more $(shell test $(shell uname) = Darwin && echo '--no-init --raw-control-chars')
+
+
