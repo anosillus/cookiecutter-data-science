@@ -6,13 +6,15 @@ services:
     restart: always
     build:
       context: ./R_env
+    image:ds_r:v1
     volumes:
       - ./../main:/home/rstudio/main
+      - ./../playground:/home/rstudio/playground
       - ./../data:/home/rstudio/data
       - ./../src:/home/rstudio/src
       - ./../reports:/rstudio/reports
       - ./../docker_env/R_env:/rstudio/env
-    ports:
+   ports:
       - "8787:8787"
     environment:
       DISABLE_AUTH: "TRUE"
@@ -23,19 +25,21 @@ services:
     restart: always
     build:
       context: ./python_env
+    image: ds_jupyter:v1
     volumes:
       - ./../main:/home/main
       - ./../template:/home/template
+      - ./../playground:/home/playground
       - ./../data:/home/data
       - ./../src:/home/src
       - ./../reports:/home/reports
       - ./../docker_env/python_env:/home/env
-    ports:
+   ports:
       - "8888:8888"
     environment:
       ROOT: "TRUE"
       TZ: Asia/Tokyo
-    command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/main"
+    command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/"
   postgres:
     container_name: ds_postgres_container
     restart: always
@@ -67,13 +71,26 @@ services:
       PGADMIN_DEFAULT_EMAIL: pgadmin
       PGADMIN_DEFAULT_PASSWORD: pgadmin
       TZ: Asia/Tokyo
-    # volumes:
+    volumes:
+      - ./../data/db_conf/servers.json:/pgadmin4/servers.json
     # - ./../data/db_conf:/var/lib/pgadmin
     # - ./../data/db_conf/pgadmin:/var/lib/pgadmin
-    # - ./../data/db_conf/servers.json:/pgadmin4/servers.json
     # - ./../data/db:/root/.pgadmin
     # - /path/to/certificate.cert:/certs/server.cert \
     # - /path/to/certificate.key:/certs/server.key \
+    #
+  pgweb:
+    container_name: ds_pgweb_container
+    restart: always
+    image: sosedoff/pgweb
+    networks:
+      ds_net:
+        ipv4_address: 172.28.1.5
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@172.28.1.2:5432/postgres?sslmode=disable
+
 networks:
   ds_net:
     ipam:
