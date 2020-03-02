@@ -4,18 +4,20 @@ FROM nvidia/cuda:10.2-cudnn7-runtime-ubuntu18.04
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 ENV ANACONDA_VERSION=2019.10
+ENV CONDA_DIR=/opt/conda
 RUN apt-get update --fix-missing && \
     apt-get install -y wget curl bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+# ENV ANACONDA_VERSION=2019.10
 # RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-${ANACONDA_VERSION}-Linux-x86_64.sh -O ~/anaconda.sh && \
-RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2019.10-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh && \
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p $CONDA_DIR && \
+    rm ~/miniconda.sh && \
     ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    find /opt/conda/ -follow -type f -name '*.a' -delete && \
-    find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-    /opt/conda/bin/conda clean -afy
+    find $CONDA_DIR -follow -type f -name '*.a' -delete && \
+    find $CONDA_DIR -follow -type f -name '*.js.map' -delete && \
+    $CONDA_DIR/bin/conda clean --all --yes --dry-run
 RUN TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
     curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
     dpkg -i tini.deb && \
@@ -29,7 +31,6 @@ RUN mkdir -p ~/.jupyter && { \
     echo "c.JupyterLabTemplates.template_dirs = ['/home/template']"; \
     echo "c.JupyterLabTemplates.include_default = True"; \
     } | tee ~/.jupyter/jupyter_notebook_config.py
-ENV CONDA_DIR=/opt/conda
 ENV PATH /opt/conda/bin:$PATH
 RUN apt-get update --fix-missing && \
     apt-get install -y build-essential libxml2-dev fish fonts-ipafont fonts-ipaexfont fonts-noto-cjk libxml2 build-essential && \
@@ -41,7 +42,6 @@ RUN pip install jupyterlab_sql jupyterlab-git jupyter_bokeh jupyterlab_latex jup
     $CONDA_DIR/bin/conda install -c conda-forge python-language-server texlive-core pandoc bash_kernel awscli && \
     jupyter labextension install @jupyterlab/plotly-extension --no-build && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
-    jupyter labextension install jupyter-matplotlib && \
     jupyter labextension install @bokeh/jupyter_bokeh --no-build && \
     # jupyter labextension install jupyterlab-flake8 --no-build && \
     # jupyter labextension install @ryantam626/jupyterlab_code_formatter --no-build && \
@@ -82,9 +82,9 @@ COPY ./environment.yaml /tmp
 RUN $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
     $CONDA_DIR/bin/conda env update -f /tmp/environment.yaml && \
     echo "conda activate $(head -1 /tmp/environment.yaml | cut -d' ' -f2)" >> ~/.bashrc && \
-    $CONDA_DIR/bin/conda run -n python37 ipython kernel install --user --name=python37 && \
+    $CONDA_DIR/bin/conda run -n  $(head -1 /tmp/environment.yaml | cut -d' ' -f2) ipython kernel install --user --name=$(head -1 /tmp/environment.yaml | cut -d' ' -f2) && \
     rm /tmp/environment.yaml && \
-    $CONDA_DIR/bin/conda clean --all -f -y
+    $CONDA_DIR/bin/conda clean --all --yes --dry-run
 ENV PATH /opt/conda/envs/$(head -1 /tmp/environment.yaml | cut -d' ' -f2)/bin:$PATH
 EXPOSE 8888
 ENTRYPOINT [ "/usr/bin/tini", "--" ]
