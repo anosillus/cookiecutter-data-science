@@ -34,17 +34,17 @@ endif
 #################################################################################
 
 ## Run docker-compose up
-run:docker_env/docker-compose.yaml
+run:env/docker-compose.yaml
 	docker-compose up -d $@
 
 ## Rebuild docker container from file
-build:docker_env/docker-compose.yaml
+build:env/docker-compose.yaml
 	docker-compose up -d $@ --build
 
 ## Install Python Dependencies
 requirements: test_environment
-	$(PYTHON_INTERPRETER) -m pip install -U pip setuptools wheel
-	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
+	$(PYTHON_INTERPRETER) -m pip install -U pip src/setuptools src/wheel
+	$(PYTHON_INTERPRETER) -m pip install -r env/local_requirements.txt
 
 ## Make Dataset
 data: requirements
