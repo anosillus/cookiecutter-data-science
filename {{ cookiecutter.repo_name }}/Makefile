@@ -35,11 +35,11 @@ endif
 
 ## Run docker-compose up
 run:env/docker-compose.yaml
-	docker-compose up -d $@
+	docker-compose -f $< up
 
 ## Rebuild docker container from file
 build:env/docker-compose.yaml
-	docker-compose up -d $@ --build
+	docker-compose -f $< up --build
 
 ## Install Python Dependencies
 requirements: test_environment
