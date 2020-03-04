@@ -28,7 +28,7 @@ RUN mkdir -p ~/.jupyter && { \
     echo "c.NotebookApp.allow_root = True"; \
     echo "c.NotebookApp.ip = '0.0.0.0'"; \
     echo "c.NotebookApp.token = ''"; \
-    echo "c.JupyterLabTemplates.template_dirs = ['/home/template']"; \
+    echo "c.JupyterLabTemplates.template_dirs = ['/root/template']"; \
     echo "c.JupyterLabTemplates.include_default = True"; \
     } | tee ~/.jupyter/jupyter_notebook_config.py
 ENV PATH /opt/conda/bin:$PATH

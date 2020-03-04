@@ -27,19 +27,19 @@ services:
       context: ./python_env
     image: ds_jupyter:v1
     volumes:
-      - ./../main:/home/main
-      - ./../template:/home/template
-      - ./../playground:/home/playground
-      - ./../data:/home/data
-      - ./../src:/home/src
-      - ./../reports:/home/reports
-      - ./../docker_env/python_env:/home/env
+      - ./../main:/root/main
+      - ./../template:/root/template
+      - ./../playground:/root/playground
+      - ./../data:/root/data
+      - ./../src:/root/src
+      - ./../reports:/root/reports
+      - ./../docker_env/python_env:/root/env
    ports:
       - "8888:8888"
     environment:
       ROOT: "TRUE"
       TZ: Asia/Tokyo
-    command: "/opt/conda/bin/jupyter lab --notebook-dir=/home/"
+    command: "/opt/conda/bin/jupyter lab --notebook-dir=/root"
   postgres:
     container_name: ds_postgres_container
     restart: always
