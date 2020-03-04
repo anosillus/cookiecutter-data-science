@@ -41,6 +41,9 @@ run:env/docker-compose.yaml
 build:env/docker-compose.yaml
 	docker-compose -f $< up --build
 
+stop:env/docker-compose.yaml
+	docker-compose -f $< down
+
 ## Install Python Dependencies
 requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -U pip src/setuptools src/wheel
