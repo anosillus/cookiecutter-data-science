@@ -38,7 +38,7 @@ RUN apt-get update --fix-missing && \
 # SHELL ["/bin/bash", "-c"]
 RUN pip install jupyterlab_sql jupyterlab-git jupyter_bokeh jupyterlab_latex jupyterlab_templates nbdime && \
     # pip install flake8 flake8-SQL flake8-bandit flake8-broken-line flake8-bugbear flake8-builtins flake8-import-order flake8-spellcheck flake8-strict flake8-string-format pandas-vet pep8-naming jupyter-lsp && \
-    $CONDA_DIR/bin/conda install jupyterlab psycopg2 ipywidgets nodejs jupyter && \
+    $CONDA_DIR/bin/conda install jupyterlab psycopg2 ipywidgets nodejs watermark jupyter && \
     $CONDA_DIR/bin/conda install -c conda-forge python-language-server texlive-core pandoc bash_kernel awscli && \
     jupyter labextension install @jupyterlab/plotly-extension --no-build && \
     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
