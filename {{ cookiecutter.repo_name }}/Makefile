@@ -33,36 +33,61 @@ endif
 # COMMANDS                                                                      #
 #################################################################################
 
+.PHONY: run
 ## Run docker-compose up
 run:env/docker-compose.yaml
 	docker-compose -f $< up
 
+.PHONY: gpu-test1
+## gpu-debug for docker test
+gpu-test1:
+	docker run --gpus all --rm nvidia/cuda nvidia-smi
+
+.PHONY: gpu-test2
+## gpu-debug for image test
+gpu-test2:
+	docker run --gpus 2 -p 8888:8888 ds_jupyter:v1 /opt/conda/bin/jupyter lab --notebook-dir=/root
+
+.PHONY: gpu
+## Run local container with gpu.[Note] Please define the target container name!!
+gpu:
+	docker run --gpus 2 -p 8888:8888 -v $(PWD)/main:/root/main -v $(PWD)/template:/root/template -v $(PWD)/playground:/root/playground -v $(PWD)/data:/root/data -v $(PWD)/src:/root/src -v $(PWD)/reports:/root/reports -v $(PWD)/docker_env/python_env:/root/env ds_jupyter:v1 /opt/conda/bin/jupyter lab --notebook-dir=/root
+
+.PHONY: build
 ## Rebuild docker container from file
 build:env/docker-compose.yaml
 	docker-compose -f $< up --build
 
+.PHONY: stop
+## Stop running container
 stop:env/docker-compose.yaml
 	docker-compose -f $< down
 
+.PHONY: requirements
 ## Install Python Dependencies
 requirements: test_environment
 	$(PYTHON_INTERPRETER) -m pip install -U pip src/setuptools src/wheel
 	$(PYTHON_INTERPRETER) -m pip install -r env/local_requirements.txt
 
+.PHONY: data
 ## Make Dataset
 data: requirements
 	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
 
+.PHONY: clean
 ## Delete all compiled Python files
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 	find . -type -d name "ipynb_checkpoints" -delete
 
+.PHONY: lint
 ## Lint using flake8
 lint:
 	flake8 src
 
+
+.PHONY: sync_data_to_s3
 ## Upload Data to S3
 sync_data_to_s3:
 ifeq (default,$(PROFILE))
@@ -71,6 +96,7 @@ else
 	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
 endif
 
+.PHONY: sync_data_from_s3
 ## Download Data from S3
 sync_data_from_s3:
 ifeq (default,$(PROFILE))
