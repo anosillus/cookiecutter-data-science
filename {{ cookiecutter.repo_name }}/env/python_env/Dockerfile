@@ -69,7 +69,6 @@ RUN $CONDA_DIR/bin/conda install jupyterlab psycopg2 ipywidgets nodejs jupyter &
     # widgetnbextension  https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
     # jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     # jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \
-    jupyter labextension install jupyterlab_bokeh --no-build && \
     # jupyter lab build --dev-build=False && \
     jupyter lab build && \
         jupyter lab clean && \
