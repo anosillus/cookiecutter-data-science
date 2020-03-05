@@ -33,8 +33,11 @@ RUN mkdir -p ~/.jupyter && { \
     } | tee ~/.jupyter/jupyter_notebook_config.py
 ENV PATH /opt/conda/bin:$PATH
 RUN apt-get update --fix-missing && \
-    apt-get install -y build-essential libxml2-dev fish fonts-ipafont fonts-ipaexfont fonts-noto-cjk libxml2 build-essential && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get install -y build-essential libxml2-dev fish fonts-ipafont fonts-ipaexfont fonts-noto-cjk libxml2 \
+    #   autoconf automake libtool zlib1g-dev libicu-dev libpango1.0-dev libcairo2-dev \
+    #   libgomp1 libgif7 libwebpmux3 libwebp6 libopenjp2-7 libpng16-16 libtiff5 zlib1g libopencv-dev libleptonica-dev swig && \
+    #   tesseract-ocr libtesseract-dev tesseract-ocr-jpn tesseract-ocr-eng \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 # SHELL ["/bin/bash", "-c"]
 RUN $CONDA_DIR/bin/conda install jupyterlab psycopg2 ipywidgets nodejs jupyter && \
     $CONDA_DIR/bin/conda install -c conda-forge python-language-server texlive-core pandoc bash_kernel awscli && \
