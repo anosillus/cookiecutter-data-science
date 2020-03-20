@@ -6,10 +6,11 @@ channels:
   - pytorch
 dependencies:
   - python=3.7.*
-  # - cudatoolkit=10.*
-  # - pytorch
-  # - torchvision
+  # - pytorch::cudatoolkit=10.1
+  # - pytorch::pytorch
+  # - pytorch::torchvision
   # - opencv=4.*
+  # - pillow=6.2.1 # for torchvision
   # - pydotplus
   # - python-graphviz
   # - networkx

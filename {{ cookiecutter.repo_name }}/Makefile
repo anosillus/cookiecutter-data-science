@@ -46,7 +46,7 @@ gpu-test1:
 .PHONY: gpu-test2
 ## gpu-debug for image test
 gpu-test2:
-	docker run --gpus 2 -p 8888:8888 ds_jupyter:v1 /opt/conda/bin/jupyter lab --notebook-dir=/root
+	docker run --gpus all -p 8888:8888 ds_jupyter:v1 /opt/conda/bin/jupyter lab --notebook-dir=/root
 
 .PHONY: gpu
 ## Run local container with gpu.[Note] Please define the target container name!!
