@@ -1,7 +1,7 @@
-{{cookiecutter.project_name}}
+ground
 ==============================
 
-{{cookiecutter.description}}
+A short description of the project.
 
 Project Organization
 ------------
@@ -49,7 +49,7 @@ Project Organization
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
     │
-    └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
+    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
 
 --------
